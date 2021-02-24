@@ -2,14 +2,13 @@ from setuptools import setup, find_packages
 
 setup(
     name = 'store',
-    version = '0.0.1',
+    version = '0.0.2',
     packages = find_packages(),
     install_requires = [
-        "Flask==0.10.1",
-        "Flask-Login==0.2.7",
-        "Flask-WTF==0.9.3",
-        "Werkzeug==0.9.4",
-        # "requests==2.1.0"
+        "Flask",
+        "Flask-Login",
+        "Flask-WTF",
+        "Werkzeug",
         "requests"
     ],
     url = 'http://cottagelabs.com/',
