@@ -3,7 +3,7 @@ import os, requests, json, uuid, shutil
 
 from flask import Flask, request, send_file, abort, make_response, logging
 
-from logging import Formatter
+import logging
 from logging.handlers import RotatingFileHandler
 
 
@@ -16,7 +16,7 @@ app.config['STORAGE_FOLDER'] = '/home/green/jperstore'
 
 file_handler = RotatingFileHandler('/home/green/jperstorelog', maxBytes=10000000, backupCount=5)
 file_handler.setLevel(logging.DEBUG)
-file_handler.setFormatter(Formatter(
+file_handler.setFormatter(logging.Formatter(
     '%(asctime)s %(levelname)s: %(message)s '
     '[in %(pathname)s:%(lineno)d %(module)s %(funcName)s]'
 ))
@@ -81,7 +81,7 @@ def storage(path=''):
 
 if __name__ == "__main__":
     if not os.path.exists(app.config['STORAGE_FOLDER']):
-        print 'Storage folder does not exist!'
+        print('Storage folder does not exist!')
         exit
     else:
         app.run(host='0.0.0.0', debug=app.config['DEBUG'], port=app.config['PORT'], threaded=app.config['THREADED'])
