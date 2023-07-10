@@ -28,11 +28,7 @@ class MoveToTree:
                 dir = pattern.sub('', this_path)
                 status, new_dir, dest = self.move_directory(this_path, dir)
                 if status and self.dry_run:
-                    log_file.writelines([
-                        f"source: {dir_path}",
-                        f"new dirs: {new_dir}",
-                        f"dest: {dest}"
-                    ])
+                    log_file.writeline(f"source: {dir_path} | new dirs: {new_dir} | dest: {dest}")
                 count += 1
 
         if self.dry_run:
