@@ -77,9 +77,9 @@ class MoveToTree:
         return True, new_dir_path, dest
 
 
-
-# from lib.move_to_tree import MoveToTree
-# sf = "/home/anusha/Documents/src/deepgreen/jperstore_modified/"
-# mt = MoveToTree(sf)
-# mt.move_directories()
+if name == __main__:
+    sf = "/data/green/jperstore"
+    new_sf = "/data/green/jperstore_v2"
+    mt = MoveToTree(sf, new_sf, create_new_listing=False, dry_run=True)
+    mt.move_directories()
 
