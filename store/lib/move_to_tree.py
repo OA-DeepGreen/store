@@ -4,10 +4,11 @@ import re
 import shutil
 
 class MoveToTree:
-    def __init__(self, storage_folder, dir_listing = "/tmp/jperstore_dir.txt", create_new_listing = False, dry_run=True):
+    def __init__(self, storage_folder, new_storage_folder, dir_listing = "/tmp/jperstore_dir.txt", create_new_listing = False, dry_run=True):
         self.depth = 2
         self.length = 2
         self.storage_folder = storage_folder.rstrip('/')
+        self.new_storage_folder = new_storage_folder
         self.create_new_listing = create_new_listing
         self.dir_listing = dir_listing
         self.dry_run = dry_run
@@ -24,11 +25,11 @@ class MoveToTree:
             log_file = open(self.dir_move_log, 'w')
         count = 1
         with open(self.dir_listing, 'r') as dir_file:
-            for dir_path in dir_file:
-                this_path = dir_path.strip('\n')
-                print(f"Processing {count}: {this_path}")
-                dir = pattern.sub('', this_path)
-                status, new_dir, dest = self.move_directory(this_path, dir)
+            for line in dir_file:
+                dir_path = line.strip('\n')
+                print(f"Processing {count}: {dir_path}")
+                this_dir = pattern.sub('', dir_path)
+                status, new_dir, dest = self.move_directory(dir_path, this_dir)
                 if status and self.dry_run:
                     log_file.write(f"source: {dir_path} | new dirs: {new_dir} | dest: {dest}\n")
                 count += 1
@@ -51,28 +52,29 @@ class MoveToTree:
         tree_path = os.path.join(self.storage_folder, *tree)
         return tree_path
 
-    def move_directory(self, dir_path, dir):
-        if dir == self.storage_folder:
+    def move_directory(self, dir_path, this_dir):
+        if this_dir == self.storage_folder:
             return False, None, None
-        if len(dir.strip()) == 0:
+        if len(this_dir.strip()) == 0:
             # parent dir
-            print(f"Not processing {dir}")
+            print(f"Not processing {this_dir}")
             return False, None, None
-        if dir.startswith('.'):
+        if this_dir.startswith('.'):
             # hidden dir
-            print(f"Not processing {dir}")
+            print(f"Not processing {this_dir}")
             return False, None, None
-        if not os.path.exists(dir):
-            print(f"Directory does not exist. Not processing {dir}")
+        if not os.path.exists(dir_path):
+            print(f"Directory does not exist. Not processing {dir_path}")
             return False, None, None
 
-        new_dir = self.new_directories(dir)
-        dest = os.path.join(new_dir, dir)
+        new_dir = self.new_directories(this_dir)
+        new_dir_path = os.path.join(self.new_storage_folder, new_dir)
+        dest = os.path.join(new_dir_path, this_dir)
         if not self.dry_run:
-            if not os.path.exists(new_dir):
-                os.makedirs(new_dir)
+            if not os.path.exists(new_dir_path):
+                os.makedirs(new_dir_path)
             shutil.move(dir_path, dest)
-        return True, new_dir, dest
+        return True, new_dir_path, dest
 
 
 
