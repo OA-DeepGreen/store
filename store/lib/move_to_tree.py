@@ -2,6 +2,7 @@ import os
 import subprocess
 import re
 import shutil
+import time
 
 class MoveToTree:
     def __init__(self, storage_folder, new_storage_folder, dir_listing = "/tmp/jperstore_dir.txt", create_new_listing = False, dry_run=True):
@@ -15,6 +16,7 @@ class MoveToTree:
         self.dir_move_log = "/tmp/jperstore_dir.log"
 
     def move_directories(self):
+        start_time = time.time()
         self.get_directories_to_move()
         if not os.path.isfile(self.dir_listing):
             print("File with list of directories to move is missing")
@@ -36,6 +38,8 @@ class MoveToTree:
 
         if self.dry_run:
             log_file.close()
+        print(f"Number of directories moved: {count}")
+        print("--- %s seconds ---" % (time.time() - start_time))
         return True
 
     def get_directories_to_move(self):
@@ -78,11 +82,8 @@ class MoveToTree:
 
 
 if __name__ == "__main__":
-    import time
-    start_time = time.time()
     sf = "/data/green/jperstore"
     new_sf = "/data/green/jperstore_v2"
     mt = MoveToTree(sf, new_sf, create_new_listing=False, dry_run=True)
     mt.move_directories()
-    print("--- %s seconds ---" % (time.time() - start_time))
 
