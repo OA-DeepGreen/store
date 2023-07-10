@@ -4,10 +4,11 @@ import re
 import shutil
 
 class MoveToTree:
-    def __init__(self, storage_folder, dir_listing = "/tmp/jperstore_dir.txt", dry_run=True):
+    def __init__(self, storage_folder, dir_listing = "/tmp/jperstore_dir.txt", create_new_listing = False, dry_run=True):
         self.depth = 2
         self.length = 2
         self.storage_folder = storage_folder.rstrip('/')
+        self.create_new_listing = create_new_listing
         self.dir_listing = dir_listing
         self.dry_run = dry_run
         self.dir_move_log = "/tmp/jperstore_dir.log"
@@ -15,6 +16,7 @@ class MoveToTree:
     def move_directories(self):
         self.get_directories_to_move()
         if not os.path.isfile(self.dir_listing):
+            print("File with list of directories to move is missing")
             return False
 
         pattern = re.compile(f"^{self.storage_folder}[/]")
@@ -28,7 +30,7 @@ class MoveToTree:
                 dir = pattern.sub('', this_path)
                 status, new_dir, dest = self.move_directory(this_path, dir)
                 if status and self.dry_run:
-                    log_file.writeline(f"source: {dir_path} | new dirs: {new_dir} | dest: {dest}")
+                    log_file.write(f"source: {dir_path} | new dirs: {new_dir} | dest: {dest}\n")
                 count += 1
 
         if self.dry_run:
@@ -36,6 +38,8 @@ class MoveToTree:
         return True
 
     def get_directories_to_move(self):
+        if not self.create_new_listing:
+            return
         if os.path.isfile(self.dir_listing):
             os.remove(self.dir_listing)
         command = f"find {self.storage_folder} -maxdepth 1 >> {self.dir_listing}"
@@ -58,11 +62,15 @@ class MoveToTree:
             # hidden dir
             print(f"Not processing {dir}")
             return False, None, None
+        if not os.path.exists(dir):
+            print(f"Directory does not exist. Not processing {dir}")
+            return False, None, None
 
         new_dir = self.new_directories(dir)
         dest = os.path.join(new_dir, dir)
         if not self.dry_run:
-            os.makedirs(new_dir)
+            if not os.path.exists(new_dir):
+                os.makedirs(new_dir)
             shutil.move(dir_path, dest)
         return True, new_dir, dest
 
