@@ -53,7 +53,7 @@ class MoveToTree:
     def new_directories(self, first_dir):
         chunks = [first_dir[i:i + self.length] for i in range(0, len(first_dir), self.length)]
         tree = chunks[0:min(self.depth, len(chunks))]
-        tree_path = os.path.join(self.storage_folder, *tree)
+        tree_path = os.path.join(self.new_storage_folder, *tree)
         return tree_path
 
     def move_directory(self, dir_path, this_dir):
@@ -71,8 +71,7 @@ class MoveToTree:
             print(f"Directory does not exist. Not processing {dir_path}")
             return False, None, None
 
-        new_dir = self.new_directories(this_dir)
-        new_dir_path = os.path.join(self.new_storage_folder, new_dir)
+        new_dir_path = self.new_directories(this_dir)
         dest = os.path.join(new_dir_path, this_dir)
         if not self.dry_run:
             if not os.path.exists(new_dir_path):
