@@ -3,7 +3,7 @@ import os, requests, json, uuid, shutil
 from flask import Flask, request, send_file, abort, make_response, logging
 import logging
 from logging.handlers import RotatingFileHandler
-from lib.storage_tree import StorageTree
+from store.lib.storage_tree import StorageTree
 
 app = Flask(__name__)
 app.config['HOST'] = "localhost"
