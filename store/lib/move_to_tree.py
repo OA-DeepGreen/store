@@ -8,7 +8,7 @@ class MoveToTree:
         self.depth = 2
         self.length = 2
         self.storage_folder = storage_folder.rstrip('/')
-        self.new_storage_folder = new_storage_folder
+        self.new_storage_folder = new_storage_folder.rstrip('/')
         self.create_new_listing = create_new_listing
         self.dir_listing = dir_listing
         self.dry_run = dry_run
@@ -77,9 +77,12 @@ class MoveToTree:
         return True, new_dir_path, dest
 
 
-if name == __main__:
+if __name__ == "__main__":
+    import time
+    start_time = time.time()
     sf = "/data/green/jperstore"
     new_sf = "/data/green/jperstore_v2"
     mt = MoveToTree(sf, new_sf, create_new_listing=False, dry_run=True)
     mt.move_directories()
+    print("--- %s seconds ---" % (time.time() - start_time))
 
