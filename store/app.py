@@ -1,11 +1,9 @@
 
 import os, requests, json, uuid, shutil
-
 from flask import Flask, request, send_file, abort, make_response, logging
-
 import logging
 from logging.handlers import RotatingFileHandler
-
+from store.lib.storage_tree import StorageTree
 
 app = Flask(__name__)
 app.config['HOST'] = "localhost"
@@ -21,14 +19,14 @@ file_handler.setFormatter(logging.Formatter(
     '[in %(pathname)s:%(lineno)d %(module)s %(funcName)s]'
 ))
 app.logger.addHandler(file_handler)
-
+st = StorageTree(app.config['STORAGE_FOLDER'])
 
 @app.route('/')
 @app.route('/<path:path>', methods=['GET','POST','PUT','DELETE'])
 def storage(path=''):
     if '..' in path or path.startswith('/'):
         abort(400)
-    dir = app.config['STORAGE_FOLDER'] + '/' + path
+    dir = st.tree_path(path)
     if path == '':
         listing = os.listdir( dir )
         resp = make_response( json.dumps( listing ) )
