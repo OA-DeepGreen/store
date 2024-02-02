@@ -22,6 +22,35 @@ file_handler.setFormatter(logging.Formatter(
 app.logger.addHandler(file_handler)
 st = StorageTree(app.config['STORAGE_FOLDER'])
 
+@app.route('/backup/<path:path>', methods=['GET','PUT','DELETE'])
+def storage_backup(path=''):
+    # the backup file ends with .bak_n
+    if '..' in path or path.startswith('/'):
+        abort(400)
+    dir = st.tree_path(path)
+    if path == '':
+        abort(400)
+    if not os.path.exists(dir):
+        abort(404)
+    if os.path.isdir(dir):
+        abort(400)
+    if request.method == 'DELETE' or ( request.method == 'POST' and request.form.get('submit','').lower() == 'delete' ):
+        bak_helper = BackupFilesHelper(dir)
+        bak_helper.delete_backup_files()
+        return ''
+    elif request.method == 'PUT':
+        bak_helper = BackupFilesHelper(dir)
+        bak_helper.make_new_backup_file()
+        return ''
+    elif request.method == 'GET':
+        bak_helper = BackupFilesHelper(dir)
+        listing = bak_helper.get_backup_files()
+        resp = make_response( json.dumps( listing ) )
+        resp.mimetype = "application/json"
+        return resp
+    else:
+        abort(400)
+
 @app.route('/')
 @app.route('/<path:path>', methods=['GET','POST','PUT','DELETE'])
 def storage(path=''):
@@ -77,34 +106,6 @@ def storage(path=''):
     else:
         abort(400)
 
-@app.route('/backup/<path:path>', methods=['GET','PUT','DELETE'])
-def storage_backup(path=''):
-    # the backup file ends with .bak_n
-    if '..' in path or path.startswith('/'):
-        abort(400)
-    dir = st.tree_path(path)
-    if path == '':
-        abort(400)
-    if not os.path.exists(dir):
-        abort(404)
-    if os.path.isdir(dir):
-        abort(400)
-    if request.method == 'DELETE' or ( request.method == 'POST' and request.form.get('submit','').lower() == 'delete' ):
-        bak_helper = BackupFilesHelper(dir)
-        bak_helper.delete_backup_files()
-        return ''
-    elif request.method == 'PUT':
-        bak_helper = BackupFilesHelper(dir)
-        bak_helper.make_new_backup_file()
-        return ''
-    elif request.method == 'GET':
-        bak_helper = BackupFilesHelper(dir)
-        listing = bak_helper.get_backup_files()
-        resp = make_response( json.dumps( listing ) )
-        resp.mimetype = "application/json"
-        return resp
-    else:
-        abort(400)
 if __name__ == "__main__":
     if not os.path.exists(app.config['STORAGE_FOLDER']):
         print('Storage folder does not exist!')
