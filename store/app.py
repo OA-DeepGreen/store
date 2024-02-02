@@ -35,15 +35,15 @@ def storage_backup(path=''):
     if os.path.isdir(dir):
         abort(400)
     if request.method == 'DELETE' or ( request.method == 'POST' and request.form.get('submit','').lower() == 'delete' ):
-        bak_helper = BackupFilesHelper(dir)
+        bak_helper = BackupHelper(dir)
         bak_helper.delete_backup_files()
         return ''
     elif request.method == 'PUT':
-        bak_helper = BackupFilesHelper(dir)
+        bak_helper = BackupHelper(dir)
         bak_helper.make_new_backup_file()
         return ''
     elif request.method == 'GET':
-        bak_helper = BackupFilesHelper(dir)
+        bak_helper = BackupHelper(dir)
         listing = bak_helper.get_backup_files()
         resp = make_response( json.dumps( listing ) )
         resp.mimetype = "application/json"
