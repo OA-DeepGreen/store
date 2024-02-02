@@ -31,15 +31,18 @@ class BackupHelper:
         return glob.glob(f"{self.path}/*.bak*")
 
     def get_last_backup_file(self):
-        return max(self.get_backup_files(), key=os.path.getctime)
+        backup_files = self.get_backup_files()
+        if len(backup_files) == 0:
+            return None
+        return max(backup_files, key=os.path.getctime)
 
     def get_last_version(self):
         last_backup_file = self.get_last_backup_file()
-        last_version = last_backup_file.rsplit('.bak', 1)[1]
-        if last_version:
-            return last_version.to_i
-        else:
-            return 0
+        if last_backup_file:
+            last_version = last_backup_file.rsplit('.bak', 1)[1]
+            if last_version and last_version.isnumeric():
+                return last_version.to_i
+        return 0
 
     def get_new_backup_file(self):
         new_version = self.get_last_version() + 1
