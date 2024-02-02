@@ -48,7 +48,7 @@ class BackupHelper:
         return self.new_backup_file
 
     def make_new_backup_file(self):
-        get_new_backup_file()
+        self.get_new_backup_file()
         if not os.path.exists(self.new_backup_file):
             shutil.copy(self.file_path, self.new_backup_file())
             return True
