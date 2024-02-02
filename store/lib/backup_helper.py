@@ -31,7 +31,7 @@ class BackupHelper:
         return glob.glob(f"{self.path}/*.bak*")
 
     def get_last_backup_file(self):
-        return max(get_backup_files(), key=os.path.getctime)
+        return max(self.get_backup_files(), key=os.path.getctime)
 
     def get_last_version(self):
         last_backup_file = self.get_last_backup_file()
