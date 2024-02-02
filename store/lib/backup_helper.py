@@ -39,9 +39,9 @@ class BackupHelper:
     def get_last_version(self):
         last_backup_file = self.get_last_backup_file()
         if last_backup_file:
-            last_version = last_backup_file.rsplit('.bak', 1)[1]
+            last_version = last_backup_file.rsplit('.bak_', 1)[1]
             if last_version and last_version.isnumeric():
-                return last_version.to_i
+                return int(last_version)
         return 0
 
     def get_new_backup_file(self):
