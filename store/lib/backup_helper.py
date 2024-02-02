@@ -48,14 +48,14 @@ class BackupHelper:
         new_version = self.get_last_version() + 1
         new_backup_file_name = f"{self.base_file_name}.bak_{new_version}"
         self.new_backup_file = os.path.join(self.path, new_backup_file_name)
-        return self.new_backup_file
+        return new_backup_file_name
 
     def make_new_backup_file(self):
-        self.get_new_backup_file()
-        if not os.path.exists(self.new_backup_file):
-            shutil.copy(self.file_path, self.new_backup_file())
-            return True
-        return False
+        new_backup_file_name = self.get_new_backup_file()
+        if os.path.exists(self.file_path):
+            shutil.copy(self.file_path, self.new_backup_file)
+            return new_backup_file_name
+        return ''
 
     def delete_backup_files(self):
         backup_files = self.get_backup_files()

@@ -22,7 +22,7 @@ file_handler.setFormatter(logging.Formatter(
 app.logger.addHandler(file_handler)
 st = StorageTree(app.config['STORAGE_FOLDER'])
 
-@app.route('/backup/<path:path>', methods=['GET','PUT','DELETE'])
+@app.route('/backup/<path:path>', methods=['GET','POST','DELETE'])
 def storage_backup(path=''):
     # the backup file ends with .bak_n
     if '..' in path or path.startswith('/'):
@@ -38,10 +38,12 @@ def storage_backup(path=''):
         bak_helper = BackupHelper(dir)
         bak_helper.delete_backup_files()
         return ''
-    elif request.method == 'PUT':
+    elif request.method == 'POST':
         bak_helper = BackupHelper(dir)
-        bak_helper.make_new_backup_file()
-        return ''
+        backup_file = bak_helper.make_new_backup_file()
+        resp = make_response(json.dumps(backup_file))
+        resp.mimetype = "application/json"
+        return resp
     elif request.method == 'GET':
         bak_helper = BackupHelper(dir)
         listing = bak_helper.get_backup_files()
