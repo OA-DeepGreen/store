@@ -4,6 +4,7 @@ from flask import Flask, request, send_file, abort, make_response, logging
 import logging
 from logging.handlers import RotatingFileHandler
 from store.lib.storage_tree import StorageTree
+from store.lib.backup_helper import BackupHelper
 
 app = Flask(__name__)
 app.config['HOST'] = "localhost"
@@ -20,6 +21,37 @@ file_handler.setFormatter(logging.Formatter(
 ))
 app.logger.addHandler(file_handler)
 st = StorageTree(app.config['STORAGE_FOLDER'])
+
+@app.route('/backup/<path:path>', methods=['GET','POST','DELETE'])
+def storage_backup(path=''):
+    # the backup file ends with .bak_n
+    if '..' in path or path.startswith('/'):
+        abort(400)
+    dir = st.tree_path(path)
+    if path == '':
+        abort(400)
+    if not os.path.exists(dir):
+        abort(404)
+    if os.path.isdir(dir):
+        abort(400)
+    if request.method == 'DELETE' or ( request.method == 'POST' and request.form.get('submit','').lower() == 'delete' ):
+        bak_helper = BackupHelper(dir)
+        bak_helper.delete_backup_files()
+        return ''
+    elif request.method == 'POST':
+        bak_helper = BackupHelper(dir)
+        backup_file = bak_helper.make_new_backup_file()
+        resp = make_response(json.dumps(backup_file))
+        resp.mimetype = "application/json"
+        return resp
+    elif request.method == 'GET':
+        bak_helper = BackupHelper(dir)
+        listing = bak_helper.get_backup_files()
+        resp = make_response( json.dumps( listing ) )
+        resp.mimetype = "application/json"
+        return resp
+    else:
+        abort(400)
 
 @app.route('/')
 @app.route('/<path:path>', methods=['GET','POST','PUT','DELETE'])
@@ -75,7 +107,6 @@ def storage(path=''):
             return resp
     else:
         abort(400)
-
 
 if __name__ == "__main__":
     if not os.path.exists(app.config['STORAGE_FOLDER']):
