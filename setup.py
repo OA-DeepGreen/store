@@ -6,10 +6,9 @@ setup(
     packages = find_packages(),
     python_requires=">=3.11",
     install_requires = [
-        "Flask~=3.0",
+        "Flask<3.0",   # FIXME: after 3, needs version 3 of werkzeug,
         "Flask-Login~=0.6",
-        "Flask-WTF~=1.2",
-        "Werkzeug~=3.0",
+        "Werkzeug<3.0",  # FIXME: we have passwords using sha1 that are undecodable after 3.0,
         "requests~=2.32"
     ],
     url = 'http://cottagelabs.com/',
