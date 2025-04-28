@@ -2,14 +2,14 @@ from setuptools import setup, find_packages
 
 setup(
     name = 'store',
-    version = '0.0.3',
+    version = '1.1',
     packages = find_packages(),
+    python_requires=">=3.11",
     install_requires = [
-        "Flask==1.1.2",
-        "Flask-Login==0.5.0",
-        "Flask-WTF==0.14.3",
-        "Werkzeug==1.0.1",
-        "requests==2.25.1"
+        "Flask<3.0",   # FIXME: after 3, needs version 3 of werkzeug,
+        "Flask-Login~=0.6",
+        "Werkzeug<3.0",  # FIXME: we have passwords using sha1 that are undecodable after 3.0,
+        "requests~=2.32"
     ],
     url = 'http://cottagelabs.com/',
     author = 'Cottage Labs',
