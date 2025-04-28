@@ -108,13 +108,11 @@ def storage(path=''):
     else:
         abort(400)
 
-@app.route('/existing_files/<path:path>', methods=['GET'])
-def existing_files(path):
+@app.route('/list_of_files/<path:path>', methods=['GET'])
+def list_of_files(path):
     dir_path = st.tree_path(path)
     if not os.path.exists(dir_path):
         abort(404)
-    elif os.path.isfile(dir_path):
-        return send_file(dir_path)
     else:
         store_files = list(str(x) for x in Path(dir_path).rglob("*"))
         resp = make_response( json.dumps( store_files ) )
