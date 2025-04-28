@@ -108,8 +108,8 @@ def storage(path=''):
     else:
         abort(400)
 
-@app.route('/list_of_files/<path:path>', methods=['GET'])
-def list_of_files(path):
+@app.route('/list_files/<path:path>', methods=['GET'])
+def list_files(path):
     dir_path = st.tree_path(path)
     if not os.path.exists(dir_path):
         abort(404)
