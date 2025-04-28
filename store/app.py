@@ -1,6 +1,6 @@
-
 import os, requests, json, uuid, shutil
-from flask import Flask, request, send_file, abort, make_response, logging
+from pathlib import Path
+from flask import Flask, request, send_file, abort, make_response
 import logging
 from logging.handlers import RotatingFileHandler
 from store.lib.storage_tree import StorageTree
@@ -107,6 +107,18 @@ def storage(path=''):
             return resp
     else:
         abort(400)
+
+@app.route('/list_files/<path:path>', methods=['GET'])
+def list_files(path):
+    dir_path = st.tree_path(path)
+    if not os.path.exists(dir_path):
+        abort(404)
+    else:
+        store_files = list(str(x) for x in Path(dir_path).rglob("*"))
+        resp = make_response( json.dumps( store_files ) )
+        resp.mimetype = "application/json"
+        return resp
+
 
 if __name__ == "__main__":
     if not os.path.exists(app.config['STORAGE_FOLDER']):
