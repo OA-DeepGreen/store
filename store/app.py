@@ -27,9 +27,9 @@ def storage_backup(path=''):
     # the backup file ends with .bak_n
     if '..' in path or path.startswith('/'):
         abort(400)
-    dir = st.tree_path(path)
     if path == '':
         abort(400)
+    dir = st.tree_path(path)
     if not os.path.exists(dir):
         abort(404)
     if os.path.isdir(dir):
@@ -107,6 +107,23 @@ def storage(path=''):
             return resp
     else:
         abort(400)
+
+@app.route('/list_files/<path:path>', methods=['GET'])
+def list_files(path=''):
+    if '..' in path or path.startswith('/'):
+        abort(400)
+    if path == '':
+        abort(400)
+    dir = st.tree_path(path)
+    if not os.path.exists(dir):
+        abort(404)
+    elif os.path.isfile(dir):
+        return json.dumps( [dir] )
+    else:
+        list_full_paths = [ os.path.join(dir,f) for f in os.listdir( dir ) ]
+        resp = make_response( json.dumps( list_full_paths ) )
+        resp.mimetype = "application/json"
+        return resp
 
 if __name__ == "__main__":
     if not os.path.exists(app.config['STORAGE_FOLDER']):
